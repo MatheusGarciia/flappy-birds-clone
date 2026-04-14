@@ -14,7 +14,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100%;
+    min-height: 100vh;
 }
 
 /* Estilo do Game */
@@ -31,8 +31,11 @@ body {
 [tp-flappy] {
     position: relative;
     border: 5px solid dodgerblue;
-    height: 700px;
-    width: 1200px;
+    width: 90vw;
+    height: 80vh;
+
+    max-width: 1200px;
+    max-height: 700px;
     background-color: skyblue;
     overflow: hidden;
 }
@@ -59,16 +62,16 @@ body {
     align-items: center;
 }
 
-.border-obstacle {
+.obstacle .border {
     height: 30px;
     width: 130px;
     background: linear-gradient(90deg, #639301, #A5E82E);
     border: 2px solid #000;
 }
 
-.body-obstacle {
-    height: 150px;
-    width: 110px;
+.obstacle .body {
+    width: 8vw;
+    max-width: 110px;
     background: linear-gradient(90deg, #639301, #A5E82E);
     border-left: 2px solid #000;
     border-right: 2px solid #000;

@@ -5,10 +5,23 @@
     <title>Mini curso - Construindo seu jogo em JavaScript</title>
     <link rel="stylesheet" href="css/flappy.css" />
 </head>
-<body class="conteudo">
+<body class="content">
     <h1>Flappy Bird</h1>
     <main tp-flappy>
-        <img src="./imagens/passaro.png" alt="" class="passaro">
+        <img src="./imagens/passaro.png" alt="" class="bird">
+
+        <div class="obstacle-pair">
+            <div class="obstacle">
+                <div class="body-obstacle"></div>
+                <div class="border-obstacle"></div>
+            </div>
+            <div class="obstacle">
+                <div class="border-obstacle"></div>
+                <div class="body-obstacle"></div>
+            </div>
+
+        </div>
+        <div class="progress">100</div>
     </main>
     <script src="js/flappy.js"></script>
 </body>

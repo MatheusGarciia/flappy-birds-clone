@@ -28,7 +28,7 @@ Durante o desenvolvimento deste projeto, foram trabalhados conceitos importantes
 - Organização de código em JavaScript
 - Atualização dinâmica da interface
 
-Como testar
+## Como testar
 
 Você pode testar clicando [AQUI](https://flappybirdclonemg.netlify.app).
 
@@ -51,7 +51,7 @@ As próximas versões serão evoluções autorais do projeto, com melhorias e no
 - Melhorias visuais
 - Sons e efeitos
 - Ajustes de dificuldade
-- Refatoração do código
+- Refatoração do código // Feita
 
 ## Melhorias futuras
 

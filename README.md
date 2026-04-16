@@ -30,10 +30,19 @@ Durante o desenvolvimento deste projeto, foram trabalhados conceitos importantes
 
 Como testar
 
-Você pode testar clicando [aqui](https://flappybirdclonemg.netlify.app)
+Você pode testar clicando [AQUI](https://flappybirdclonemg.netlify.app).
 
-Versões
+## Versões
+
 v1.0 - Esta versão foi desenvolvida integralmente durante a aula do curso, seguindo as instruções propostas.
+
+v1.1 - Refatoração completa do código JavaScript.
+
+- Troca de funções construtoras por class.
+- Separação de responsabilidades mais clara.
+- Evita recriar funções dentro do construtor (melhor performance).
+- Uso consistente de const e let.
+- Métodos mais legíveis.
 
 ## Próximas versões
 

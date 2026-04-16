@@ -1,182 +1,195 @@
-function newElement(tagName, className) {
-  const elem = document.createElement(tagName);
-  elem.className = className;
-  return elem;
+const newElement = (tagName, className) => {
+  const element = document.createElement(tagName);
+  element.className = className;
+  return element;
+};
+
+class Obstacle {
+  constructor(reverse = false) {
+    this.element = newElement("div", "obstacle");
+
+    this.border = newElement("div", "border");
+    this.body = newElement("div", "body");
+
+    this.element.appendChild(reverse ? this.body : this.border);
+    this.element.appendChild(reverse ? this.border : this.body);
+  }
+
+  setHeight(height) {
+    this.body.style.height = `${height}px`;
+  }
 }
 
-function Obstacle(reverse = false) {
-  this.element = newElement("div", "obstacle");
+class ObstaclePair {
+  constructor(height, opening, x) {
+    this.element = newElement("div", "obstacle-pair");
 
-  const border = newElement("div", "border");
-  const body = newElement("div", "body");
+    this.top = new Obstacle(true);
+    this.bottom = new Obstacle(false);
 
-  this.element.appendChild(reverse ? body : border);
-  this.element.appendChild(reverse ? border : body);
+    this.top.element.classList.add("top");
+    this.bottom.element.classList.add("bottom");
 
-  this.setHeight = (height) => (body.style.height = `${height}px`);
-}
+    this.element.append(this.top.element, this.bottom.element);
 
-function ObstaclePair(height, opening, x) {
-  this.element = newElement("div", "obstacle-pair");
+    this.height = height;
+    this.opening = opening;
 
-  this.top = new Obstacle(true);
-  this.bottom = new Obstacle(false);
+    this.sortOpening();
+    this.setX(x);
+  }
 
-  this.top.element.classList.add("top");
-  this.bottom.element.classList.add("bottom");
-
-  this.element.appendChild(this.top.element);
-  this.element.appendChild(this.bottom.element);
-
-  this.sortOpening = () => {
-    const openingHeight = opening;
-    const minBottom = height * 0.15;
-
-    const maxTop = height - openingHeight - minBottom;
+  sortOpening() {
+    const minBottom = this.height * 0.15;
+    const maxTop = this.height - this.opening - minBottom;
 
     const heightTop = Math.random() * maxTop;
-    const heightBottom = height - openingHeight - heightTop;
+    const heightBottom = this.height - this.opening - heightTop;
 
     this.top.setHeight(heightTop);
     this.bottom.setHeight(heightBottom);
 
-    this.bottom.element.style.top = `${heightTop + openingHeight}px`;
-  };
+    this.bottom.element.style.top = `${heightTop + this.opening}px`;
+  }
 
-  this.setX = (x) => {
+  setX(x) {
     this.element.style.left = `${x}px`;
-  };
+  }
 
-  this.getX = () => {
-    return parseInt(this.element.style.left.split("px")[0]);
-  };
+  getX() {
+    return parseInt(this.element.style.left, 10);
+  }
 
-  this.getWidth = () => this.element.clientWidth;
-
-  this.sortOpening();
-  this.setX(x);
+  getWidth() {
+    return this.element.clientWidth;
+  }
 }
 
-function Obstacles(height, width, opening, space, notifyPoint) {
-  this.pairs = [
-    new ObstaclePair(height, opening, width),
-    new ObstaclePair(height, opening, width + space),
-    new ObstaclePair(height, opening, width + space * 2),
-    new ObstaclePair(height, opening, width + space * 3),
-  ];
+class Obstacles {
+  constructor(height, width, opening, space, notifyPoint) {
+    this.space = space;
+    this.notifyPoint = notifyPoint;
+    this.width = width;
+    this.displacement = 3;
 
-  const displacement = 3;
+    this.pairs = Array.from({ length: 4 }, (_, i) => {
+      return new ObstaclePair(height, opening, width + space * i);
+    });
+  }
 
-  this.animate = () => {
+  animate() {
     this.pairs.forEach((pair) => {
-      pair.setX(pair.getX() - displacement);
+      pair.setX(pair.getX() - this.displacement);
 
       if (pair.getX() < -pair.getWidth()) {
         const maxX = Math.max(...this.pairs.map((p) => p.getX()));
-        pair.setX(maxX + space);
+        pair.setX(maxX + this.space);
         pair.sortOpening();
       }
 
-      const middle = width / 2;
-      const crossTheMiddle =
-        pair.getX() + displacement >= middle && pair.getX() < middle;
-      if (crossTheMiddle) notifyPoint();
+      const middle = this.width / 2;
+      const crossed =
+        pair.getX() + this.displacement >= middle && pair.getX() < middle;
+
+      if (crossed) this.notifyPoint();
     });
-  };
+  }
 }
 
-function Bird(gameHeight) {
-  let flying = false;
+class Bird {
+  constructor(gameHeight) {
+    this.gameHeight = gameHeight;
+    this.flying = false;
 
-  this.element = newElement("img", "bird");
-  this.element.src = "imagens/passaro.png";
+    this.element = newElement("img", "bird");
+    this.element.src = "imagens/passaro.png";
 
-  this.getY = () => parseInt(this.element.style.bottom || "0");
-  this.setY = (y) => (this.element.style.bottom = `${y}px`);
+    this.setY(gameHeight / 2);
 
-  window.onkeydown = (e) => (flying = true);
-  window.onkeyup = (e) => (flying = false);
+    window.addEventListener("keydown", () => (this.flying = true));
+    window.addEventListener("keyup", () => (this.flying = false));
+  }
 
-  this.animate = () => {
-    const newY = this.getY() + (flying ? 8 : -5);
-    const maxHeight = gameHeight - this.element.clientHeight;
+  getY() {
+    return parseInt(this.element.style.bottom || "0", 10);
+  }
 
-    if (newY <= 0) {
-      this.setY(0);
-    } else if (newY >= maxHeight) {
-      this.setY(maxHeight);
-    } else {
-      this.setY(newY);
-    }
-  };
+  setY(y) {
+    this.element.style.bottom = `${y}px`;
+  }
 
-  this.setY(gameHeight / 2);
+  animate() {
+    const newY = this.getY() + (this.flying ? 8 : -5);
+    const maxHeight = this.gameHeight - this.element.clientHeight;
+
+    this.setY(Math.max(0, Math.min(newY, maxHeight)));
+  }
 }
 
-function Progress() {
-  this.element = newElement("span", "progress");
+class Progress {
+  constructor() {
+    this.element = newElement("span", "progress");
+    this.update(0);
+  }
 
-  this.attPoints = (points) => {
+  update(points) {
     this.element.innerHTML = points;
-  };
-  this.attPoints(0);
+  }
 }
 
-function Overlapping(elementA, elementB) {
-  const a = elementA.getBoundingClientRect();
-  const b = elementB.getBoundingClientRect();
+const isOverlapping = (a, b) => {
+  const rectA = a.getBoundingClientRect();
+  const rectB = b.getBoundingClientRect();
 
-  const horizontal = a.left < b.right && a.right > b.left;
-  const vertical = a.top < b.bottom && a.bottom > b.top;
+  const horizontal = rectA.left < rectB.right && rectA.right > rectB.left;
+
+  const vertical = rectA.top < rectB.bottom && rectA.bottom > rectB.top;
 
   return horizontal && vertical;
-}
+};
 
-function Collided(bird, obstacles) {
-  let collided = false;
-
-  obstacles.pairs.forEach((obstaclesPair) => {
-    const top = obstaclesPair.top.element;
-    const bottom = obstaclesPair.bottom.element;
-
-    collided =
-      collided ||
-      Overlapping(bird.element, top) ||
-      Overlapping(bird.element, bottom);
+const hasCollision = (bird, obstacles) => {
+  return obstacles.pairs.some((pair) => {
+    return (
+      isOverlapping(bird.element, pair.top.element) ||
+      isOverlapping(bird.element, pair.bottom.element)
+    );
   });
+};
 
-  return collided;
-}
+class FlappyBird {
+  constructor() {
+    this.points = 0;
 
-function FlappyBird() {
-  let points = 0;
+    this.gameArea = document.querySelector("[tp-flappy]");
+    this.height = this.gameArea.clientHeight;
+    this.width = this.gameArea.clientWidth;
 
-  const gameArea = document.querySelector(`[tp-flappy]`);
-  const height = gameArea.clientHeight;
-  const width = gameArea.clientWidth;
+    this.progress = new Progress();
 
-  const progress = new Progress();
-  const obstacles = new Obstacles(height, width, 200, 400, () =>
-    progress.attPoints(++points),
-  );
+    this.obstacles = new Obstacles(this.height, this.width, 200, 400, () =>
+      this.progress.update(++this.points),
+    );
 
-  const bird = new Bird(height);
+    this.bird = new Bird(this.height);
 
-  gameArea.appendChild(progress.element);
-  gameArea.appendChild(bird.element);
+    this.gameArea.append(
+      this.progress.element,
+      this.bird.element,
+      ...this.obstacles.pairs.map((p) => p.element),
+    );
+  }
 
-  obstacles.pairs.forEach((pair) => gameArea.appendChild(pair.element));
+  start() {
+    this.timer = setInterval(() => {
+      this.obstacles.animate();
+      this.bird.animate();
 
-  this.start = () => {
-    const timer = setInterval(() => {
-      obstacles.animate();
-      bird.animate();
-
-      if (Collided(bird, obstacles)) {
-        clearInterval(timer);
+      if (hasCollision(this.bird, this.obstacles)) {
+        clearInterval(this.timer);
       }
     }, 20);
-  };
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
